@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏴 CTF Lab Platform
 
 Full CTF lab platform cho sinh viên — từ Easy đến Hard, gồm 6 mảng chính.
@@ -45,3 +46,6 @@ docker-compose up -d
 ## 📖 Tài liệu
 
 Xem `docs/ROADMAP.md` để biết lộ trình học và cách giải từng challenge.
+=======
+# gdu-ctf-lab
+>>>>>>> 3203b7d14750467227dfb5d42afb61c1a34e8840

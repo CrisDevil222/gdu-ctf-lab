@@ -114,6 +114,88 @@ services:
     networks:
       - ctf_network
 
+  # ─────────────────────────────────────────
+  # REVERSE ENGINEERING
+  # ─────────────────────────────────────────
+  re-strings-easy:
+    build: ./challenges/re/strings-easy
+    restart: always
+    ports:
+      - "8001:5000"
+    environment:
+      - FLAG=CTF{str1ngs_t00l_1s_y0ur_fr13nd}
+    networks:
+      - ctf_network
+
+  re-xor-easy:
+    build: ./challenges/re/xor-easy
+    restart: always
+    ports:
+      - "8002:5000"
+    environment:
+      - FLAG=CTF{x0r_1s_s1mpl3_crypt0}
+    networks:
+      - ctf_network
+
+  re-base64-easy:
+    build: ./challenges/re/base64-re-easy
+    restart: always
+    ports:
+      - "8003:5000"
+    environment:
+      - FLAG=CTF{b4s364_1n_b1n4ry_3ncod1ng}
+    networks:
+      - ctf_network
+
+  # ─────────────────────────────────────────
+  # PWN
+  # ─────────────────────────────────────────
+  pwn-bof-easy:
+    build: ./challenges/pwn/bof-easy
+    restart: always
+    ports:
+      - "9001:5000"
+    environment:
+      - FLAG=CTF{buff3r_0v3rfl0w_smash_th3_st4ck}
+    networks:
+      - ctf_network
+
+  pwn-ret2win-easy:
+    build: ./challenges/pwn/ret2win-easy
+    restart: always
+    ports:
+      - "9002:5000"
+    environment:
+      - FLAG=CTF{r3t2w1n_y0u_c0ntr0l_rip}
+    networks:
+      - ctf_network
+
+  # ─────────────────────────────────────────
+  # MISC
+  # ─────────────────────────────────────────
+  misc-morse-easy:
+    build: ./challenges/misc/morse-easy
+    restart: always
+    ports:
+      - "10001:5000"
+    environment:
+      - FLAG=CTF{m0rs3_c0d3_1s_fun}
+    networks:
+      - ctf_network
+
+  # ─────────────────────────────────────────
+  # OSINT
+  # ─────────────────────────────────────────
+  osint-metadata-easy:
+    build: ./challenges/osint/metadata-easy
+    restart: always
+    ports:
+      - "11001:5000"
+    environment:
+      - FLAG=CTF{3x1f_m3t4d4t4_l34ks}
+    networks:
+      - ctf_network
+
 volumes:
   ctfd_data:
   ctfd_uploads:
