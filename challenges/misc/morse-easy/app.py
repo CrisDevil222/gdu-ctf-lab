@@ -1,108 +1,98 @@
-from flask import Flask, request, render_template_string
-import os
+from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{m0rs3_c0d3_1s_fun}")
 
-MORSE_CODE = {
-    'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
-    'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
-    'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
-    'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
-    'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---',
-    '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...',
-    '8': '---..', '9': '----.', '{': '-.--.', '}': '-.--.-', '_': '..--.-'
+FLAG = 'CTF{m0rs3_c0d3_1s_fun}'
+
+MORSE = {
+    'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+    'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+    'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
+    '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.',
+    '{':'-.--.-','}':'-.--.-','_':'..__','!':'-.-.--'
 }
 
-def to_morse(text):
+def text_to_morse(text):
     result = []
-    for ch in text.upper():
-        if ch == ' ':
+    for c in text.upper():
+        if c == ' ':
             result.append('/')
-        elif ch in MORSE_CODE:
-            result.append(MORSE_CODE[ch])
+        elif c in MORSE:
+            result.append(MORSE[c])
         else:
             result.append('?')
     return ' '.join(result)
 
-MORSE_FLAG = to_morse(FLAG)
-
-TEMPLATE = """
-<!DOCTYPE html>
-<html>
+HTML = '''<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <title>Misc - Morse Code</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Courier New',monospace; background:#1a1200; color:#ffd700; min-height:100vh; padding:40px; }
-        .container { max-width:700px; margin:0 auto; }
-        h1 { color:#ffd700; font-size:2rem; margin-bottom:8px; text-shadow:0 0 10px #ffd700; }
-        .sub { color:#886600; margin-bottom:32px; }
-        .morse-box { background:#111; border:2px solid #ffd700; border-radius:8px; padding:32px; margin-bottom:24px; text-align:center; }
-        .morse-text { font-size:1.1rem; letter-spacing:3px; line-height:2; word-break:break-all; color:#ffff00; }
-        .hint { background:#111; border-left:3px solid #ffd700; padding:16px; color:#ffd700; font-size:0.85rem; line-height:1.8; margin-bottom:24px; }
-        .table { width:100%; border-collapse:collapse; margin-bottom:24px; font-size:0.8rem; }
-        .table td { padding:4px 8px; border:1px solid #443300; text-align:center; }
-        .table tr:nth-child(even) td { background:#111; }
-        form { display:flex; gap:12px; }
-        input { flex:1; padding:12px; background:#111; border:1px solid #ffd700; color:#ffd700; font-family:inherit; border-radius:4px; }
-        button { padding:12px 24px; background:#221100; border:1px solid #ffd700; color:#ffd700; font-family:inherit; cursor:pointer; border-radius:4px; }
-        .result { margin-top:16px; padding:12px; border-radius:4px; }
-        .success { border:1px solid #00ff00; color:#00ff00; background:#001100; }
-        .error { border:1px solid #ff0000; color:#ff0000; background:#110000; }
-    </style>
+<meta charset="UTF-8">
+<title>Morse Code — GDU-CTF</title>
+<style>
+body{font-family:monospace;background:#0d1117;color:#c9d1d9;max-width:800px;margin:0 auto;padding:40px 20px;}
+h1{color:#ffd600;letter-spacing:.1em;}
+.badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:.75rem;font-weight:700;background:#a16207;color:#fff;margin-bottom:16px;}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:24px;margin:16px 0;}
+.card h3{color:#ffd600;margin:0 0 12px;}
+pre{background:#0d1117;padding:16px;border-radius:6px;overflow-x:auto;color:#58d68d;border:1px solid #30363d;word-break:break-all;white-space:pre-wrap;}
+input[type=text]{background:#0d1117;border:1px solid #30363d;color:#c9d1d9;padding:10px 14px;border-radius:6px;width:100%;font-family:monospace;font-size:.9rem;margin-top:8px;}
+input[type=text]:focus{border-color:#ffd600;outline:none;}
+button{background:#ffd600;color:#000;font-weight:700;padding:10px 24px;border-radius:6px;border:none;cursor:pointer;margin-top:12px;font-family:monospace;}
+.success{background:#14532d;border:1px solid #16a34a;padding:12px;border-radius:6px;color:#4ade80;margin-top:12px;}
+.error{background:#450a0a;border:1px solid #dc2626;padding:12px;border-radius:6px;color:#f87171;margin-top:12px;}
+.flag-format{color:#ffd600;font-weight:700;}
+</style>
 </head>
 <body>
-<div class="container">
-    <h1>·−·· ·−−·</h1>
-    <p class="sub">Misc — Morse Code [Easy]</p>
+<h1>📡 Morse Code</h1>
+<span class="badge">MISC — EASY</span>
+<span class="badge" style="background:#15803d;">100 pts</span>
 
-    <div class="morse-box">
-        <p style="color:#886600;margin-bottom:16px;font-size:0.85rem">📡 Intercepted transmission:</p>
-        <div class="morse-text">{{ morse_flag }}</div>
-    </div>
+<div class="card">
+  <h3>📋 Mô tả</h3>
+  <p>Decode chuỗi Morse Code dưới đây để tìm flag.</p>
+  <p>Flag format: <span class="flag-format">CTF{...}</span></p>
+</div>
 
-    <div class="hint">
-        💡 <strong>Hint:</strong> Đây là Morse code.<br>
-        <code>.</code> = dit (ngắn) &nbsp;|&nbsp; <code>-</code> = dah (dài) &nbsp;|&nbsp; <code>/</code> = space<br><br>
-        <strong>Tools:</strong> morsecode.world hoặc dcodex.com/morse-code<br>
-        Lưu ý: <code>-.--.  = {</code> &nbsp;|&nbsp; <code>-.--.- = }</code> &nbsp;|&nbsp; <code>..--.- = _</code>
-    </div>
+<div class="card">
+  <h3>📡 Morse Signal</h3>
+  <pre>{{ morse }}</pre>
+</div>
 
-    <table class="table">
-        <tr><td>A .-</td><td>B -...</td><td>C -.-.</td><td>D -..</td><td>E .</td><td>F ..-.</td></tr>
-        <tr><td>G --.</td><td>H ....</td><td>I ..</td><td>J .---</td><td>K -.-</td><td>L .-..</td></tr>
-        <tr><td>M --</td><td>N -.</td><td>O ---</td><td>P .--.</td><td>Q --.-</td><td>R .-.</td></tr>
-        <tr><td>S ...</td><td>T -</td><td>U ..-</td><td>V ...-</td><td>W .--</td><td>X -..-</td></tr>
-        <tr><td>Y -.--</td><td>Z --..</td><td>0 -----</td><td>1 .----</td><td>2 ..---</td><td>3 ...--</td></tr>
-        <tr><td>4 ....-</td><td>5 .....</td><td>6 -....</td><td>7 --...</td><td>8 ---..</td><td>9 ----.</td></tr>
-    </table>
+<div class="card">
+  <h3>💡 Gợi ý</h3>
+  <ul>
+    <li>Dấu cách phân cách các ký tự</li>
+    <li>Dấu / phân cách các từ</li>
+    <li>Dùng: <a href="https://morsecode.world/international/translator.html" target="_blank" style="color:#ffd600;">morsecode.world</a></li>
+    <li>Hoặc CyberChef: From Morse Code operation</li>
+  </ul>
+</div>
 
-    <form method="POST">
-        <input type="text" name="flag" placeholder="CTF{...}" autocomplete="off">
-        <button type="submit">Submit</button>
-    </form>
-    {% if result %}
-    <div class="result {{ result_class }}">{{ result }}</div>
-    {% endif %}
+<div class="card">
+  <h3>🚩 Submit Flag</h3>
+  <form method="POST">
+    <input type="text" name="flag" placeholder="CTF{...}" value="{{ submitted }}">
+    <br><button type="submit">Submit</button>
+  </form>
+  {% if result == 'correct' %}
+  <div class="success">✅ Correct! Well done!</div>
+  {% elif result == 'wrong' %}
+  <div class="error">❌ Wrong flag. Try again!</div>
+  {% endif %}
 </div>
 </body>
-</html>
-"""
+</html>'''
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    morse = text_to_morse(FLAG)
     result = None
-    result_class = None
-    if request.method == "POST":
-        flag = request.form.get("flag", "").strip()
-        if flag == FLAG:
-            result = f"🎉 Decoded! {FLAG}"
-            result_class = "success"
-        else:
-            result = "❌ Wrong! Try again..."
-            result_class = "error"
-    return render_template_string(TEMPLATE, result=result, result_class=result_class, morse_flag=MORSE_FLAG)
+    submitted = ''
+    if request.method == 'POST':
+        submitted = request.form.get('flag', '')
+        result = 'correct' if submitted.strip() == FLAG else 'wrong'
+    return render_template_string(HTML, morse=morse, result=result, submitted=submitted)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

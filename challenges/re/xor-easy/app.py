@@ -1,99 +1,84 @@
-from flask import Flask, request, render_template_string
-import os
+from flask import Flask, render_template_string, send_file
+import io
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{x0r_1s_s1mpl3_crypt0}")
 
-# XOR encrypt flag với key
-XOR_KEY = 0x42
-ENCRYPTED = [ord(c) ^ XOR_KEY for c in FLAG]
-ENCRYPTED_HEX = ' '.join(f'{b:02x}' for b in ENCRYPTED)
-
-TEMPLATE = """
-<!DOCTYPE html>
-<html>
+HTML = '''<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <title>RE - XOR Cipher</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #00ff00; min-height: 100vh; padding: 40px; }
-        .container { max-width: 700px; margin: 0 auto; }
-        h1 { color: #00ff00; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 0 10px #00ff00; }
-        .sub { color: #008800; margin-bottom: 32px; font-size: 0.85rem; }
-        .terminal { background: #111; border: 1px solid #00ff00; border-radius: 4px; padding: 24px; margin-bottom: 24px; line-height: 1.8; }
-        .cmd { color: #ffff00; }
-        .out { color: #00ff00; }
-        .hex { color: #ff8800; font-size: 1.1rem; letter-spacing: 2px; word-break: break-all; }
-        .hint { background: #111; border-left: 3px solid #ffff00; padding: 16px; color: #ffff00; font-size: 0.85rem; line-height: 1.8; margin-bottom: 24px; }
-        .code { background: #0a0a0a; border: 1px solid #333; padding: 12px; border-radius: 4px; margin: 8px 0; color: #00aaff; }
-        form { display: flex; gap: 12px; }
-        input { flex: 1; padding: 12px; background: #111; border: 1px solid #00ff00; color: #00ff00; font-family: inherit; border-radius: 4px; }
-        button { padding: 12px 24px; background: #003300; border: 1px solid #00ff00; color: #00ff00; font-family: inherit; cursor: pointer; border-radius: 4px; }
-        .result { margin-top: 16px; padding: 12px; border-radius: 4px; }
-        .success { border: 1px solid #00ff00; color: #00ff00; background: #001100; }
-        .error { border: 1px solid #ff0000; color: #ff0000; background: #110000; }
-    </style>
+<meta charset="UTF-8">
+<title>XOR Cipher — GDU-CTF</title>
+<style>
+body{font-family:monospace;background:#0d1117;color:#c9d1d9;max-width:800px;margin:0 auto;padding:40px 20px;}
+h1{color:#00e5ff;letter-spacing:.1em;}
+.badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:.75rem;font-weight:700;background:#1d4ed8;color:#fff;margin-bottom:16px;}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:24px;margin:16px 0;}
+.card h3{color:#00e5ff;margin:0 0 12px;}
+pre{background:#0d1117;padding:16px;border-radius:6px;overflow-x:auto;color:#58d68d;border:1px solid #30363d;}
+a.btn{display:inline-block;background:#00e5ff;color:#000;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none;margin-top:12px;}
+a.btn:hover{background:#00b8d4;}
+.flag-format{color:#ffd600;font-weight:700;}
+</style>
 </head>
 <body>
-<div class="container">
-    <h1>$ analyze xor_binary</h1>
-    <p class="sub">Reverse Engineering — XOR Cipher [Easy]</p>
+<h1>🔐 XOR Cipher</h1>
+<span class="badge">RE — EASY</span>
+<span class="badge" style="background:#15803d;">100 pts</span>
 
-    <div class="terminal">
-        <div class="cmd"># Phân tích binary, tìm thấy đoạn code sau:</div>
-        <br>
-        <div class="code">
-        int key = 0x42;<br>
-        char encrypted[] = { {{ encrypted_bytes }} };<br>
-        for(int i=0; i&lt;len; i++)<br>
-        &nbsp;&nbsp;printf("%c", encrypted[i] ^ key);
-        </div>
-        <br>
-        <div class="cmd"># Encrypted bytes (hex):</div>
-        <div class="hex">{{ encrypted_hex }}</div>
-    </div>
+<div class="card">
+  <h3>📋 Mô tả</h3>
+  <p>Một chương trình đã mã hóa flag bằng phép toán XOR với một key bí mật. Hãy phân tích binary, tìm key và giải mã flag.</p>
+  <p>Flag format: <span class="flag-format">CTF{...}</span></p>
+</div>
 
-    <div class="hint">
-        💡 <strong>Hint:</strong> XOR có tính chất đối xứng: <code>A XOR B XOR B = A</code><br>
-        Nếu <code>plaintext XOR key = ciphertext</code><br>
-        Thì <code>ciphertext XOR key = plaintext</code><br><br>
-        <strong>Python giải:</strong><br>
-        <code>encrypted = [{{ encrypted_bytes }}]</code><br>
-        <code>key = 0x42</code><br>
-        <code>print(''.join(chr(b ^ key) for b in encrypted))</code>
-    </div>
+<div class="card">
+  <h3>💡 Gợi ý</h3>
+  <ul>
+    <li>Dùng <code>strings</code> để tìm chuỗi trong binary</li>
+    <li>Dùng Ghidra hoặc IDA để decompile</li>
+    <li>XOR có tính chất: A XOR K = C → C XOR K = A</li>
+    <li>Nếu biết flag bắt đầu bằng <code>CTF{</code>, bạn có thể tìm ra key</li>
+  </ul>
+</div>
 
-    <form method="POST">
-        <input type="text" name="flag" placeholder="CTF{...}" autocomplete="off">
-        <button type="submit">Submit</button>
-    </form>
-
-    {% if result %}
-    <div class="result {{ result_class }}">{{ result }}</div>
-    {% endif %}
+<div class="card">
+  <h3>📥 Download</h3>
+  <p>Download file binary và phân tích:</p>
+  <a class="btn" href="/download">⬇ Download xor_crackme</a>
 </div>
 </body>
-</html>
-"""
+</html>'''
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/')
 def index():
-    result = None
-    result_class = None
-    if request.method == "POST":
-        flag = request.form.get("flag", "").strip()
-        if flag == FLAG:
-            result = f"🎉 Correct! {FLAG}"
-            result_class = "success"
-        else:
-            result = "❌ Wrong! Try again..."
-            result_class = "error"
-    return render_template_string(TEMPLATE,
-        result=result,
-        result_class=result_class,
-        encrypted_hex=ENCRYPTED_HEX,
-        encrypted_bytes=', '.join(f'0x{b:02x}' for b in ENCRYPTED)
+    return render_template_string(HTML)
+
+@app.route('/download')
+def download():
+    # Tạo binary với flag XOR encoded
+    key = 0x59
+    flag = b'CTF{x0r_1s_s1mpl3_crypt0}'
+    cipher = bytes([b ^ key for b in flag])
+    
+    # Tạo ELF-like binary giả với cipher embedded
+    binary = b'\x7fELF' + b'\x00' * 12
+    binary += b'XOR Challenge Binary\x00'
+    binary += b'Enter the key to decrypt: \x00'
+    binary += b'Wrong key!\x00'
+    binary += b'Correct!\x00'
+    binary += b'\x00' * 32
+    binary += b'cipher_data:\x00'
+    binary += cipher
+    binary += b'\x00' * 32
+    binary += b'key_hint: single byte XOR\x00'
+    binary += b'\x00' * 64
+    
+    return send_file(
+        io.BytesIO(binary),
+        mimetype='application/octet-stream',
+        as_attachment=True,
+        download_name='xor_crackme'
     )
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
