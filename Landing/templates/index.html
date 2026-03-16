@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDU Network & Cybersecurity Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: #fff;
+      color: #212529;
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      background: #1a1a2e;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-size: .95rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .06em;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a {
+      font-size: .8rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 5px;
+      transition: all .2s;
+    }
+    .nav-links a:hover { color: #fff; background: rgba(255,255,255,.1); }
+    .nav-links a.btn-nav {
+      background: #1a73e8;
+      color: #fff;
+      font-weight: 700;
+    }
+    .nav-links a.btn-nav:hover { background: #1557b0; }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 52px 24px 60px;
+      text-align: center;
+    }
+
+    /* Logo */
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .logo-box {
+      width: 160px; height: 160px;
+      border-radius: 20px;
+      border: 2px dashed #ddd;
+      background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: #bbb;
+      font-size: .75rem;
+    }
+    /* Khi có logo thật: thay .logo-box bằng <img> */
+
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 6px;
+    }
+    .hero-sub {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #6c757d;
+      margin-bottom: 36px;
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 22px 26px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .section-title {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: #1a73e8;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .section p {
+      font-size: .9rem;
+      line-height: 1.78;
+      color: #444;
+    }
+    .section ul {
+      padding-left: 18px;
+      margin-top: 6px;
+    }
+    .section ul li {
+      font-size: .88rem;
+      line-height: 1.72;
+      color: #444;
+      margin-bottom: 5px;
+    }
+    .section ul li strong { color: #222; }
+    .section ul li a { color: #1a73e8; text-decoration: none; }
+    .section ul li a:hover { text-decoration: underline; }
+
+    /* ── CATEGORY BADGES ── */
+    .cats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .cat {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .cat-web   { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+    .cat-pwn   { background:#fff1f2; color:#be123c; border-color:#fecdd3; }
+    .cat-re    { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+    .cat-crypto{ background:#fefce8; color:#a16207; border-color:#fde68a; }
+    .cat-foren { background:#faf5ff; color:#7e22ce; border-color:#e9d5ff; }
+    .cat-misc  { background:#fff7ed; color:#c2410c; border-color:#fed7aa; }
+    .cat-osint { background:#f0f9ff; color:#0369a1; border-color:#bae6fd; }
+
+    /* ── CTA ── */
+    .cta-wrap {
+      margin: 28px 0 10px;
+    }
+    .btn-cta {
+      display: inline-block;
+      background: #1a73e8;
+      color: #fff;
+      font-weight: 700;
+      font-size: .92rem;
+      padding: 12px 36px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 2px 10px rgba(26,115,232,.3);
+    }
+    .btn-cta:hover {
+      background: #1557b0;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(26,115,232,.4);
+    }
+
+    /* ── SOCIAL ── */
+    .follow-label {
+      font-size: .82rem;
+      color: #aaa;
+      margin: 20px 0 10px;
+    }
+    .social {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .social a {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f3f5;
+      border: 1px solid #dee2e6;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .social a:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+    .social a.fb:hover { background: #1877f2; border-color: #1877f2; }
+    .social a.fb:hover svg { fill: #fff; }
+    .social a.gh:hover { background: #24292e; border-color: #24292e; }
+    .social a.gh:hover svg { fill: #fff; }
+    .social a.dc:hover { background: #5865f2; border-color: #5865f2; }
+    .social a.dc:hover svg { fill: #fff; }
+    .social svg { width: 19px; height: 19px; fill: #555; transition: fill .2s; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      text-align: center;
+      padding: 18px;
+      font-size: .75rem;
+      color: #aaa;
+    }
+    footer strong { color: #888; }
+
+    /* ── FADE IN ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+    .hero { animation: fadeUp .45s ease both; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="/">⬡ GDU-CTF</a>
+    <div class="nav-links">
+      <a href="/challenges">Thử thách</a>
+      <a href="/scoreboard">Bảng điểm</a>
+      <a href="/users">Người dùng</a>
+      <a href="/login" class="btn-nav">Đăng nhập</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <div class="logo-box">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.4"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>Logo GDU-CTF</span>
+      </div>
+    </div>
+
+    <div class="hero-title">GDU Network & Cybersecurity Club</div>
+    <div class="hero-sub">Nền tảng thực hành & kiểm thử an ninh mạng</div>
+
+    <!-- Về chúng tôi -->
+    <div class="section">
+      <div class="section-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        Về chúng tôi
+      </div>
+      <p><strong>GDU Network & Cybersecurity Club</strong> là câu lạc bộ An Toàn Thông Tin trực thuộc Trường Đại học Gia Định, được thành lập nhằm tạo môi trường học tập, nghiên cứu và rèn luyện kỹ năng bảo mật cho sinh viên. Chúng tôi hướng tới mục tiêu đào tạo thế hệ chuyên gia an ninh mạng tiếp theo — từ cơ bản đến nâng cao.</p>
+    </div>
+
+    <!-- Hướng dẫn -->
+    <div class="section">
+      <div class="section-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        Hướng dẫn tham gia
+      </div>
+      <ul>
+        <li>Đăng ký tài khoản và đăng nhập vào hệ thống.</li>
+        <li>Đọc <strong>Rules/Quy định</strong> trước khi tham gia thi đấu.</li>
+        <li>Chọn thử thách phù hợp với trình độ — bắt đầu từ những bài <strong>Easy</strong>.</li>
+        <li>Phân tích, khai thác và tìm flag có định dạng <strong>CTF{...}</strong>.</li>
+        <li>Submit flag để ghi điểm — theo dõi bảng xếp hạng realtime.</li>
+        <li>Tham gia Discord để hỏi đáp: <a href="https://discord.gg/uFZtDGZMF" target="_blank">discord.gg/uFZtDGZMF</a></li>
+      </ul>
+    </div>
+
+    <!-- Categories -->
+    <div class="section">
+      <div class="section-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+        Các danh mục thử thách
+      </div>
+      <div class="cats">
+        <span class="cat cat-web">🌐 Web</span>
+        <span class="cat cat-pwn">💥 PWN</span>
+        <span class="cat cat-re">🔍 Reverse Engineering</span>
+        <span class="cat cat-crypto">🔐 Cryptography</span>
+        <span class="cat cat-foren">🖼 Forensics</span>
+        <span class="cat cat-misc">🎲 Misc</span>
+        <span class="cat cat-osint">🕵️ OSINT</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-wrap">
+      <a class="btn-cta" href="/login">Đăng nhập để bắt đầu →</a>
+    </div>
+
+    <!-- Social -->
+    <p class="follow-label">Follow us on social media:</p>
+    <div class="social">
+      <a class="fb" href="https://www.facebook.com/profile.php?id=61580842079606" title="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a class="gh" href="#" title="GitHub">
+        <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
+      <a class="dc" href="https://discord.gg/uFZtDGZMF" target="_blank" title="Discord">
+        <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      </a>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>GDU Network & Cybersecurity Club</strong> · Trường Đại học Gia Định · Powered by CTFd
+  </footer>
+
+</body>
+</html>
