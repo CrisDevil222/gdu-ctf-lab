@@ -116,7 +116,13 @@ services:
       - "6001:5000"
     networks:
       - ctf_network
-
+  crypto-dynastic:
+    build: ./challenges/crypto/dynastic
+    restart: always
+    ports:
+      - "6002:6002"
+    networks:
+      - ctf_network
   # ─────────────────────────────────────────
   # FORENSICS CHALLENGES
   # ─────────────────────────────────────────
