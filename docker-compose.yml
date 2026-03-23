@@ -184,7 +184,13 @@ services:
       - "10001:5000"
     networks:
       - ctf_network
-
+  misc-linux-quiz:
+    build: ./challenges/misc/linux-quiz
+    restart: always
+    ports:
+      - "7777:7777"
+    networks:
+      - ctf_network
   # ─────────────────────────────────────────
   # OSINT CHALLENGES
   # ─────────────────────────────────────────
