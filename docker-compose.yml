@@ -133,7 +133,13 @@ services:
       - "7001:5000"
     networks:
       - ctf_network
-
+  forensics-malware-analysis:
+    build: ./challenges/forensics/malware-analysis
+    restart: always
+    ports:
+      - "1337:1337" # Map thẳng port 1337 của máy chủ vào port 1337 của container
+    networks:
+      - ctf_network
   # ─────────────────────────────────────────
   # RE CHALLENGES
   # ─────────────────────────────────────────
@@ -150,14 +156,6 @@ services:
     restart: always
     ports:
       - "8002:5000"
-    networks:
-      - ctf_network
-
-  re-base64-easy:
-    build: ./challenges/re/base64-re-easy
-    restart: always
-    ports:
-      - "8003:5000"
     networks:
       - ctf_network
 
