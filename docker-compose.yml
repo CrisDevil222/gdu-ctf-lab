@@ -147,10 +147,12 @@ services:
     image: tsl0922/ttyd:latest
     container_name: web-terminal-malware
     restart: always
-    # Lệnh này sẽ mở một terminal web, và tự động gọi nc kết nối vào bài malware
-    command: ttyd -W nc forensics-malware-analysis 1337
+    depends_on:
+      - forensics-malware-analysis
+    # Đã đổi nc thành telnet ở dòng dưới
+    command: ttyd -W telnet forensics-malware-analysis 1337
     networks:
-      - ctf_network    
+      - ctf_network   
   # ─────────────────────────────────────────
   # RE CHALLENGES
   # ─────────────────────────────────────────
