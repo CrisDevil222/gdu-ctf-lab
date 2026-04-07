@@ -11,7 +11,7 @@ echo " GDU-CTF Lab — Deployment Script"
 echo "======================================"
 
 REPO_URL="https://github.com/CrisDevil222/gdu-ctf-lab"
-APP_DIR="/gdu-ctf-lab"
+APP_DIR="$HOME/gdu-ctf-lab"
 
 # ── 1. Install Docker & Docker Compose (if not already installed) ──
 if ! command -v docker &> /dev/null; then
