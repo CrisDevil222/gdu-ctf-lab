@@ -306,17 +306,7 @@ TEMPLATE = """
     <br><br>
 
     <div class="main-card">
-        <div class="hint-section">
-            💡 <strong>Challenge:</strong> This tool fetches URLs <em>server-side</em>.
-            There's an internal metadata service running at <code>http://127.0.0.1:8888</code>
-            that is <strong>not accessible from outside</strong>. Can you make the server fetch it for you?<br><br>
-            Try exploring the internal endpoints. The flag might be hidden in a credential endpoint...
-            <div class="examples">
-                <span class="example-chip" onclick="fillURL('http://example.com')">http://example.com</span>
-                <span class="example-chip" onclick="fillURL('http://127.0.0.1:8888/')">http://127.0.0.1:8888/</span>
-                <span class="example-chip" onclick="fillURL('http://localhost:8888/latest/meta-data/')">localhost:8888/meta-data/</span>
-            </div>
-        </div>
+
 
         <label class="form-label" for="url-input">URL to Fetch</label>
         <form method="GET">

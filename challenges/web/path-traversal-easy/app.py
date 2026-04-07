@@ -147,11 +147,7 @@ TEMPLATE = """
         <span class="badge">Challenge: Path Traversal [Easy]</span>
     </div>
 
-    <div class="hint-box">
-        💡 <strong>Hint:</strong> The server reads files from <code>/tmp/files/public/</code>.
-        Try to navigate outside the intended directory...
-        The endpoint is <code>/?file=welcome.txt</code>
-    </div>
+
 
     <div class="card">
         <h2>📂 Public Documents</h2>

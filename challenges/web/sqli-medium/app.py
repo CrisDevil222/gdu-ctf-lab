@@ -188,11 +188,7 @@ TEMPLATE = """
     </div>
 
     <div class="container">
-        <div class="hint-box">
-            💡 <strong>Hint:</strong> The search uses raw SQL queries. Try UNION-based injection to dump hidden tables.
-            Example: <code>Laptop' UNION SELECT 1,2,3,4,5-- -</code><br>
-            Think about: how many columns does the products table have?
-        </div>
+
 
         <div class="search-card">
             <h2>🔍 Search Products</h2>
