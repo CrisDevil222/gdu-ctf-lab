@@ -165,6 +165,14 @@ services:
     networks:
       - ctf_network
 
+  forensics-soc-chall3:
+    build: ./challenges/forensics/CTF_Chall3_SOC
+    restart: always
+    ports:
+      - "1334:1334"
+    networks:
+      - ctf_network
+
   # ─────────────────────────────────────────
   # RE CHALLENGES
   # ─────────────────────────────────────────
