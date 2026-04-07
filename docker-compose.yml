@@ -106,6 +106,30 @@ services:
     networks:
       - ctf_network
 
+  web-path-traversal-easy:
+    build: ./challenges/web/path-traversal-easy
+    restart: always
+    ports:
+      - "5005:5000"
+    networks:
+      - ctf_network
+
+  web-sqli-medium:
+    build: ./challenges/web/sqli-medium
+    restart: always
+    ports:
+      - "5006:5000"
+    networks:
+      - ctf_network
+
+  web-ssrf-medium:
+    build: ./challenges/web/ssrf-medium
+    restart: always
+    ports:
+      - "5007:5000"
+    networks:
+      - ctf_network
+
   # ─────────────────────────────────────────
   # CRYPTO CHALLENGES
   # ─────────────────────────────────────────
@@ -140,19 +164,7 @@ services:
       - "1337:1337" # Map thẳng port 1337 của máy chủ vào port 1337 của container
     networks:
       - ctf_network
-  # ─────────────────────────────────────────
-  # WEB TERMINAL CHO BÀI MALWARE (Vượt tường lửa)
-  # ─────────────────────────────────────────
-  web-terminal-malware:
-    image: tsl0922/ttyd:latest
-    container_name: web-terminal-malware
-    restart: always
-    depends_on:
-      - forensics-malware-analysis
-    # Tiêm netcat xịn vào hệ thống trước khi mở cổng
-    command: sh -c "apk add --no-cache netcat-openbsd && ttyd -W nc forensics-malware-analysis 1337"
-    networks:
-      - ctf_network
+
   # ─────────────────────────────────────────
   # RE CHALLENGES
   # ─────────────────────────────────────────
