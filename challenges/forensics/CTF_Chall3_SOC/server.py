@@ -32,7 +32,7 @@ QUESTIONS = [
     },
     {
         "q": "[Câu 2.2] Tên tệp độc hại được người dùng tải về (đường dẫn tuyệt đối):",
-        "a": r".\PathUnknown\DirectorywithID0x000005EC-00000001\AliceWong\Downloads\ Fortigate_setup.exe"
+        "a": r".\PathUnknown\DirectorywithID0x000005EC-00000001\AliceWong\Downloads\ F0rtigate_setup.exe"
     },
     {
         "q": "[Câu 3.1] Địa chỉ của Máy chủ C&C của Attacker:",
