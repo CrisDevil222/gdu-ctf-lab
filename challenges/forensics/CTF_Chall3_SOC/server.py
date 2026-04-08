@@ -35,7 +35,7 @@ QUESTIONS = [
     },
     {
         "q": "[Câu 2.2] Tên tệp độc hại được người dùng tải về (đường dẫn tuyệt đối):",
-        "a": r".\PathUnknown\DirectorywithID0x000005EC-00000001\AliceWong\Downloads\F0rtigate_setup.exe",
+        "a": r"C:\Users\Alice Wong\Downloads\F0rtigate_setup.exe",
         "flag_part": "g1v3_up_"
     },
     {
