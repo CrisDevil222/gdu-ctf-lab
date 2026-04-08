@@ -64,7 +64,7 @@ QUESTIONS = [
     },
     {
         "q": "[Câu 4.4] Công cụ thực hiện cuộc tấn công? (Kèm domain)",
-        "a": r"Emkei's Fake Mailer (emkei.cz)",
+        "a": r"emkei.cz",
         "flag_part": "ch4nc3}"
     }
 ]
