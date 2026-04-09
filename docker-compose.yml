@@ -6,6 +6,8 @@ services:
     build: ./Landing
     container_name: landing
     restart: always
+    volumes:
+      - ./shared_state:/shared_state
     networks:
       - ctf_network
     ports:
@@ -68,6 +70,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./shared_state:/shared_state:ro
     networks:
       - ctf_network
 
