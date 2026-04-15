@@ -3,7 +3,7 @@ import sqlite3
 import os
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{un10n_b4s3d_sqli_m4st3r}")
+FLAG = os.environ.get("FLAG", "")
 
 def init_db():
     conn = sqlite3.connect("/tmp/shop.db")

@@ -2,7 +2,7 @@ from flask import Flask, request, render_template_string, send_file
 import os, io
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{buff3r_0v3rfl0w_smash_th3_st4ck}")
+FLAG = os.environ.get("FLAG", "")
 
 # Vulnerable C source code để cho sinh viên xem
 VULN_SOURCE = '''#include <stdio.h>

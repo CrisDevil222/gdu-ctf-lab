@@ -3,7 +3,7 @@ import os, secrets
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
-FLAG = os.environ.get("FLAG", "CTF{xss_st0r3d_c00k13_st3al}")
+FLAG = os.environ.get("FLAG", "")
 
 # Fake "admin bot" cookie
 ADMIN_COOKIE = FLAG

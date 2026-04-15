@@ -3,7 +3,7 @@ import os, secrets
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
-FLAG = os.environ.get("FLAG", "CTF{1d0r_acc3ss_c0ntr0l_byp4ss}")
+FLAG = os.environ.get("FLAG", "")
 
 USERS = {
     1: {"name": "Alice", "email": "alice@example.com", "role": "user", "note": "My shopping list: milk, eggs"},

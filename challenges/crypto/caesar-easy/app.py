@@ -2,7 +2,7 @@ from flask import Flask, request, render_template_string
 import os
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{c4es4r_c1ph3r_1s_w34k}")
+FLAG = os.environ.get("FLAG", "")
 
 def caesar_encrypt(text, shift):
     result = ""

@@ -2,7 +2,7 @@ from flask import Flask, request, render_template_string
 import os
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{ssti_j1nj4_t3mpl4t3_1nj3ct10n}")
+FLAG = os.environ.get("FLAG", "")
 
 WRAPPER = """
 <!DOCTYPE html>

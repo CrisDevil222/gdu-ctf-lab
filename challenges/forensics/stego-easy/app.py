@@ -4,7 +4,7 @@ from PIL import Image
 import struct
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{st3g0_lsb_h1dd3n_1n_p1x3ls}")
+FLAG = os.environ.get("FLAG", "")
 
 def create_stego_image():
     """Create a PNG with flag hidden in LSB of red channel"""

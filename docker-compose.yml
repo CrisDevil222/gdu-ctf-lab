@@ -82,6 +82,8 @@ services:
     restart: always
     ports:
       - "5001:5000"
+    environment:
+      - FLAG=${FLAG_WEB_SQLI_EASY}
     networks:
       - ctf_network
 
@@ -90,6 +92,8 @@ services:
     restart: always
     ports:
       - "5002:5000"
+    environment:
+      - FLAG=${FLAG_WEB_XSS_EASY}
     networks:
       - ctf_network
 
@@ -98,6 +102,8 @@ services:
     restart: always
     ports:
       - "5003:5000"
+    environment:
+      - FLAG=${FLAG_WEB_IDOR_MEDIUM}
     networks:
       - ctf_network
 
@@ -106,6 +112,8 @@ services:
     restart: always
     ports:
       - "5004:5000"
+    environment:
+      - FLAG=${FLAG_WEB_SSTI_HARD}
     networks:
       - ctf_network
 
@@ -114,6 +122,8 @@ services:
     restart: always
     ports:
       - "5005:5000"
+    environment:
+      - FLAG=${FLAG_WEB_PATH_TRAVERSAL}
     networks:
       - ctf_network
 
@@ -122,6 +132,8 @@ services:
     restart: always
     ports:
       - "5006:5000"
+    environment:
+      - FLAG=${FLAG_WEB_SQLI_MEDIUM}
     networks:
       - ctf_network
 
@@ -130,6 +142,8 @@ services:
     restart: always
     ports:
       - "5007:5000"
+    environment:
+      - FLAG=${FLAG_WEB_SSRF_MEDIUM}
     networks:
       - ctf_network
 
@@ -141,8 +155,11 @@ services:
     restart: always
     ports:
       - "6001:5000"
+    environment:
+      - FLAG=${FLAG_CRYPTO_CAESAR}
     networks:
       - ctf_network
+
   crypto-dynastic:
     build: ./challenges/crypto/dynastic
     restart: always
@@ -150,6 +167,7 @@ services:
       - "6002:6002"
     networks:
       - ctf_network
+
   # ─────────────────────────────────────────
   # FORENSICS CHALLENGES
   # ─────────────────────────────────────────
@@ -158,13 +176,16 @@ services:
     restart: always
     ports:
       - "7001:5000"
+    environment:
+      - FLAG=${FLAG_FORENSICS_STEGO}
     networks:
       - ctf_network
+
   forensics-malware-analysis:
     build: ./challenges/forensics/malware-analysis
     restart: always
     ports:
-      - "1337:1337" # Map thẳng port 1337 của máy chủ vào port 1337 của container
+      - "1337:1337"
     networks:
       - ctf_network
 
@@ -176,6 +197,51 @@ services:
     networks:
       - ctf_network
 
+  forensics-disk-partition:
+    build: ./challenges/forensics/disk-partition
+    restart: always
+    ports:
+      - "7002:5000"
+    environment:
+      - FLAG=${FLAG_FORENSICS_DISK_PARTITION}
+      - DISK_IMG_LINK=${DISK_IMG_LINK}
+    networks:
+      - ctf_network
+
+  forensics-file-hidden:
+    build: ./challenges/forensics/file-hidden
+    restart: always
+    ports:
+      - "7003:5000"
+    environment:
+      - FLAG=${FLAG_FORENSICS_FILE_HIDDEN}
+      - WAV_LINK=${WAV_LINK}
+    networks:
+      - ctf_network
+
+  forensics-tls-challenge:
+    build: ./challenges/forensics/tls-challenge
+    restart: always
+    ports:
+      - "7004:5000"
+    environment:
+      - FLAG=${FLAG_FORENSICS_TLS}
+      - PCAP_LINK=${TLS_PCAP_LINK}
+      - KEYLOG_LINK=${TLS_KEYLOG_LINK}
+    networks:
+      - ctf_network
+
+  forensics-trashbin:
+    build: ./challenges/forensics/trashbin
+    restart: always
+    ports:
+      - "7005:5000"
+    environment:
+      - FLAG=${FLAG_FORENSICS_TRASHBIN}
+      - PCAP_LINK=${TRASHBIN_PCAP_LINK}
+    networks:
+      - ctf_network
+
   # ─────────────────────────────────────────
   # RE CHALLENGES
   # ─────────────────────────────────────────
@@ -184,6 +250,8 @@ services:
     restart: always
     ports:
       - "8001:5000"
+    environment:
+      - FLAG=${FLAG_RE_STRINGS}
     networks:
       - ctf_network
 
@@ -192,6 +260,8 @@ services:
     restart: always
     ports:
       - "8002:5000"
+    environment:
+      - FLAG=${FLAG_RE_XOR}
     networks:
       - ctf_network
 
@@ -203,6 +273,8 @@ services:
     restart: always
     ports:
       - "9001:5000"
+    environment:
+      - FLAG=${FLAG_PWN_BOF}
     networks:
       - ctf_network
 
@@ -211,6 +283,8 @@ services:
     restart: always
     ports:
       - "9002:5000"
+    environment:
+      - FLAG=${FLAG_PWN_RET2WIN}
     networks:
       - ctf_network
 
@@ -222,8 +296,11 @@ services:
     restart: always
     ports:
       - "10001:5000"
+    environment:
+      - FLAG=${FLAG_MISC_MORSE}
     networks:
       - ctf_network
+
   misc-linux-quiz:
     build: ./challenges/misc/linux-quiz
     restart: always
@@ -231,6 +308,7 @@ services:
       - "7777:7777"
     networks:
       - ctf_network
+
   # ─────────────────────────────────────────
   # OSINT CHALLENGES
   # ─────────────────────────────────────────
@@ -239,6 +317,8 @@ services:
     restart: always
     ports:
       - "11001:5000"
+    environment:
+      - FLAG=${FLAG_OSINT_METADATA}
     networks:
       - ctf_network
 
@@ -250,3 +330,4 @@ volumes:
   mysql_data:
   ctfd_data:
   ctfd_uploads:
+

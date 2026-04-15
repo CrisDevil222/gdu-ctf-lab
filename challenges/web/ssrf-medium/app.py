@@ -7,7 +7,7 @@ import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 app = Flask(__name__)
-FLAG = os.environ.get("FLAG", "CTF{ssrf_r3qu3st_f0rg3ry_pwn3d}")
+FLAG = os.environ.get("FLAG", "")
 
 # ─────────────────────────────────────────
 # Internal metadata server on port 8888
