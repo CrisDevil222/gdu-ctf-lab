@@ -2,7 +2,7 @@ from flask import Flask, request, render_template_string, abort
 import os
 
 app = Flask(__name__)
-FLAG = os.veniron.get("FLAG", "CTF{p4th_tr4v3rs4l_d1rect0ry_l34k}")
+FLAG = os.environ.get("FLAG", "CTF{p4th_tr4v3rs4l_d1rect0ry_l34k}")
 
 # Tạo file bí mật chứa flag
 os.makedirs("/tmp/files/public", exist_ok=True)
