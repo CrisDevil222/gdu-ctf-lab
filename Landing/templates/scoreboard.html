@@ -296,31 +296,33 @@
   </footer>
 
   <script>
-    // ── MOCK DATA (swap /api/scoreboard for real CTFd data) ──
-    const TEAMS = [
-      { rank:1,  name:"0xC0FFEE",      score:4850, solves:19, last:"2025-12-31 22:41" },
-      { rank:2,  name:"NullPointers",  score:4320, solves:17, last:"2025-12-31 22:55" },
-      { rank:3,  name:"ByteBreakers",  score:3970, solves:16, last:"2025-12-31 23:02" },
-      { rank:4,  name:"CryptoCrew",    score:3500, solves:14, last:"2025-12-31 21:30" },
-      { rank:5,  name:"StackSmashers", score:3100, solves:13, last:"2025-12-31 20:50" },
-      { rank:6,  name:"HexHunters",    score:2800, solves:11, last:"2025-12-31 20:10" },
-      { rank:7,  name:"GhostPing",     score:2400, solves:10, last:"2025-12-31 19:45" },
-      { rank:8,  name:"RevSlayers",    score:2150, solves: 9, last:"2025-12-31 18:30" },
-      { rank:9,  name:"NetNinjas",     score:1900, solves: 8, last:"2025-12-31 17:55" },
-      { rank:10, name:"PwnNewbies",    score:1600, solves: 7, last:"2025-12-31 17:20" },
-      { rank:11, name:"LittleHackers", score:1250, solves: 5, last:"2025-12-31 16:40" },
-      { rank:12, name:"ShadowPing",    score: 900, solves: 4, last:"2025-12-31 15:00" },
-      { rank:13, name:"ForensicForce", score: 600, solves: 3, last:"2025-12-31 14:20" },
-      { rank:14, name:"Beginnerz",     score: 350, solves: 2, last:"2025-12-31 13:00" },
-      { rank:15, name:"TryHarders",    score: 100, solves: 1, last:"2025-12-31 12:05" },
-    ];
-
-    // Score-over-time mock (hours 0..23)
-    const HOURS = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
-    const TOP5 = TEAMS.slice(0,5);
     const COLORS = ['#00d4ff','#a855f7','#f59e0b','#10b981','#ec4899'];
+    const HOURS = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
+    let allTeams = [];
+    let chartInstance = null;
 
-    // Simulate cumulative score progression
+    function rankClass(r) {
+      if(r===1) return 'r1'; if(r===2) return 'r2'; if(r===3) return 'r3'; return 'rn';
+    }
+
+    function renderPodium(teams) {
+      const top3 = teams.slice(0,3);
+      const podium = document.getElementById('podium');
+      podium.innerHTML = '';
+      const medals = ['🥇','🥈','🥉'];
+      top3.forEach((t, i) => {
+        const div = document.createElement('div');
+        div.className = `podium-card podium-${i+1}`;
+        div.innerHTML = `
+          <div class="podium-rank rank-${i+1}">${medals[i]}</div>
+          <div class="podium-team">${t.name}</div>
+          <div class="podium-score">${t.score.toLocaleString()}</div>
+          <div class="podium-meta">${t.solves} solves</div>
+        `;
+        podium.appendChild(div);
+      });
+    }
+
     function mockTimeline(finalScore, seed) {
       const pts = [0]; let acc = 0;
       const steps = finalScore / 23;
@@ -332,34 +334,15 @@
       pts[23] = finalScore; return pts;
     }
 
-    // ── RENDER PODIUM ──
-    function renderPodium() {
-      const top3 = TEAMS.slice(0,3);
-      const order = [top3[1], top3[0], top3[2]]; // 2nd, 1st, 3rd visual order on desktop
-      const podium = document.getElementById('podium');
-      podium.innerHTML = '';
-      top3.forEach((t, i) => {
-        const div = document.createElement('div');
-        div.className = `podium-card podium-${i+1}`;
-        const medals = ['🥇','🥈','🥉'];
-        div.innerHTML = `
-          <div class="podium-rank rank-${i+1}">${medals[i]}</div>
-          <div class="podium-team">${t.name}</div>
-          <div class="podium-score">${t.score.toLocaleString()}</div>
-          <div class="podium-meta">${t.solves} solves · Last: ${t.last}</div>
-        `;
-        podium.appendChild(div);
-      });
-    }
-
-    // ── RENDER CHART ──
-    function renderChart() {
+    function renderChart(teams) {
+      const top5 = teams.slice(0,5);
       const ctx = document.getElementById('scoreChart').getContext('2d');
-      new Chart(ctx, {
+      if(chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: HOURS,
-          datasets: TOP5.map((t,i) => ({
+          datasets: top5.map((t,i) => ({
             label: t.name,
             data: mockTimeline(t.score, (i+1)*1.3),
             borderColor: COLORS[i],
@@ -371,18 +354,11 @@
           }))
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: true,
+          responsive: true, maintainAspectRatio: true,
           interaction: { intersect: false, mode: 'index' },
           plugins: {
             legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 }, boxWidth: 12 } },
-            tooltip: {
-              backgroundColor: '#0d1225',
-              borderColor: 'rgba(0,212,255,.2)',
-              borderWidth: 1,
-              titleColor: '#00d4ff',
-              bodyColor: '#e2e8f0',
-            }
+            tooltip: { backgroundColor: '#0d1225', borderColor: 'rgba(0,212,255,.2)', borderWidth: 1, titleColor: '#00d4ff', bodyColor: '#e2e8f0' }
           },
           scales: {
             x: { ticks: { color: '#475569', font:{size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
@@ -392,11 +368,6 @@
       });
     }
 
-    // ── RENDER TABLE ──
-    let allTeams = [...TEAMS];
-    function rankClass(r) {
-      if(r===1) return 'r1'; if(r===2) return 'r2'; if(r===3) return 'r3'; return 'rn';
-    }
     function renderTable(teams) {
       const tbody = document.getElementById('scoreboard-body');
       if (!teams.length) {
@@ -409,27 +380,55 @@
           <td class="td-team">${t.name}</td>
           <td class="td-score center">${t.score.toLocaleString()}</td>
           <td class="td-solves center">${t.solves}</td>
-          <td class="td-time center hide-sm">${t.last}</td>
+          <td class="td-time center hide-sm">${t.last || '-'}</td>
         </tr>
       `).join('');
     }
 
-    // ── SEARCH / FILTER ──
     document.getElementById('search').addEventListener('input', function() {
       const q = this.value.trim().toLowerCase();
       const filtered = q ? allTeams.filter(t => t.name.toLowerCase().includes(q)) : allTeams;
-      document.getElementById('filter-count').textContent =
-        q ? `${filtered.length} / ${allTeams.length} đội` : `${allTeams.length} đội`;
+      document.getElementById('filter-count').textContent = `${filtered.length} / ${allTeams.length} đội`;
       renderTable(filtered);
     });
 
-    // ── INIT ──
-    renderPodium();
-    renderChart();
-    renderTable(allTeams);
-    document.getElementById('last-update').textContent =
-      `Cập nhật lần cuối: ${new Date().toLocaleTimeString('vi-VN')} · ${allTeams.length} đội thi`;
-    document.getElementById('filter-count').textContent = `${allTeams.length} đội`;
+    async function loadData() {
+      document.getElementById('last-update').textContent = 'Đang tải dữ liệu...';
+      try {
+        const res = await fetch('/api/v1/scoreboard');
+        const json = await res.json();
+        if (json.success && json.data && json.data.length > 0) {
+          allTeams = json.data.map(t => ({
+            rank: t.pos,
+            name: t.name,
+            score: t.score,
+            solves: t.solves || 0,
+            last: '-'
+          }));
+        } else {
+          // Fallback nếu chưa có dữ liệu
+          allTeams = [];
+          document.getElementById('podium').innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;width:100%">Chưa có dữ liệu bảng xếp hạng. Hãy bắt đầu giải thử thách!</div>';
+        }
+      } catch(e) {
+        allTeams = [];
+        document.getElementById('podium').innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;width:100%">Không thể tải dữ liệu.</div>';
+      }
+
+      if(allTeams.length > 0) {
+        renderPodium(allTeams);
+        renderChart(allTeams);
+      }
+      renderTable(allTeams);
+      document.getElementById('filter-count').textContent = `${allTeams.length} đội`;
+      document.getElementById('last-update').textContent =
+        `Cập nhật lần cuối: ${new Date().toLocaleTimeString('vi-VN')} · ${allTeams.length} đội thi`;
+    }
+
+    loadData();
+    // Tự refresh mỗi 60 giây
+    setInterval(loadData, 60000);
   </script>
+
 </body>
 </html>
