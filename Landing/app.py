@@ -1,11 +1,37 @@
 import os
-from flask import Flask, render_template, request
+import json
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/challenges')
+def challenges():
+    return render_template('challenges.html')
+
+@app.route('/scoreboard')
+def scoreboard():
+    return render_template('scoreboard.html')
+
+@app.route('/api/scoreboard')
+def api_scoreboard():
+    """Mock scoreboard API – replace with real CTFd integration when ready."""
+    teams = [
+        {"rank": 1,  "name": "0xC0FFEE",      "score": 4850, "solves": 19, "last": "2025-12-31 22:41"},
+        {"rank": 2,  "name": "NullPointers",  "score": 4320, "solves": 17, "last": "2025-12-31 22:55"},
+        {"rank": 3,  "name": "ByteBreakers",  "score": 3970, "solves": 16, "last": "2025-12-31 23:02"},
+        {"rank": 4,  "name": "CryptoCrew",    "score": 3500, "solves": 14, "last": "2025-12-31 21:30"},
+        {"rank": 5,  "name": "StackSmashers", "score": 3100, "solves": 13, "last": "2025-12-31 20:50"},
+        {"rank": 6,  "name": "HexHunters",    "score": 2800, "solves": 11, "last": "2025-12-31 20:10"},
+        {"rank": 7,  "name": "GhostPing",     "score": 2400, "solves": 10, "last": "2025-12-31 19:45"},
+        {"rank": 8,  "name": "RevSlayers",    "score": 2150, "solves":  9, "last": "2025-12-31 18:30"},
+        {"rank": 9,  "name": "NetNinjas",     "score": 1900, "solves":  8, "last": "2025-12-31 17:55"},
+        {"rank": 10, "name": "PwnNewbies",    "score": 1600, "solves":  7, "last": "2025-12-31 17:20"},
+    ]
+    return jsonify({"success": True, "data": teams})
 
 @app.route('/admin-secret-power')
 def toggle_maintenance():

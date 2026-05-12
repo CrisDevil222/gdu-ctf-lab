@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scoreboard · GDU-CTF</title>
+  <meta name="description" content="Bảng xếp hạng realtime GDU-CTF – Network & Cybersecurity Club">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:     #080c18;
+      --bg2:    #0d1225;
+      --cyan:   #00d4ff;
+      --purple: #a855f7;
+      --pink:   #ec4899;
+      --green:  #10b981;
+      --yellow: #f59e0b;
+      --red:    #ef4444;
+      --text:   #e2e8f0;
+      --muted:  #64748b;
+      --border: rgba(0,212,255,.14);
+      --glass:  rgba(13,18,37,.75);
+      --gold:   #fbbf24;
+      --silver: #94a3b8;
+      --bronze: #c2855e;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden;
+    }
+
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridDrift 20s linear infinite;
+    }
+    @keyframes gridDrift { 0%{ background-position:0 0; } 100%{ background-position:60px 60px; } }
+
+    .orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .orb1 { width:500px; height:500px; background:rgba(168,85,247,.1); top:-150px; left:-150px; }
+    .orb2 { width:400px; height:400px; background:rgba(0,212,255,.07); bottom:-100px; right:-100px; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,12,24,.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-weight:800; font-size:1rem; }
+    .nav-logo .hex {
+      width:32px; height:32px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.7rem; font-weight:900; color:#fff;
+    }
+    .nav-links { display:flex; align-items:center; gap:4px; }
+    .nav-links a {
+      color: rgba(226,232,240,.65); text-decoration:none; font-size:.85rem; font-weight:500;
+      padding:6px 14px; border-radius:6px; transition:all .2s;
+    }
+    .nav-links a:hover { color:var(--cyan); background:rgba(0,212,255,.08); }
+    .nav-links a.active { color:var(--cyan); }
+    .nav-links a.btn-login {
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color:#fff; font-weight:700; box-shadow: 0 0 16px rgba(0,212,255,.25);
+    }
+
+    /* MAIN */
+    main { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* PAGE HEADER */
+    .page-header { margin-bottom: 40px; animation: fadeUp .4s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+    .page-header h1 {
+      font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, #fff 30%, var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 6px;
+    }
+    .page-header p { color: var(--muted); font-size: .9rem; }
+
+    /* TOP-3 PODIUM */
+    .podium { display: flex; gap: 16px; margin-bottom: 36px; flex-wrap: wrap; }
+    .podium-card {
+      flex: 1; min-width: 220px;
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px 20px;
+      text-align: center; backdrop-filter: blur(12px);
+      position: relative; overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+      animation: fadeUp .4s ease both;
+    }
+    .podium-card:hover { transform: translateY(-4px); }
+    .podium-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: 16px 16px 0 0;
+    }
+    .podium-1::before { background: linear-gradient(90deg, var(--gold), #f97316); box-shadow: 0 0 20px rgba(251,191,36,.4); }
+    .podium-2::before { background: linear-gradient(90deg, var(--silver), #cbd5e1); box-shadow: 0 0 20px rgba(148,163,184,.3); }
+    .podium-3::before { background: linear-gradient(90deg, var(--bronze), #d97706); box-shadow: 0 0 20px rgba(194,133,94,.3); }
+    .podium-1 { box-shadow: 0 0 30px rgba(251,191,36,.1); border-color: rgba(251,191,36,.25); animation-delay:.05s; }
+    .podium-2 { box-shadow: 0 0 20px rgba(148,163,184,.08); border-color: rgba(148,163,184,.2); animation-delay:.1s; }
+    .podium-3 { box-shadow: 0 0 20px rgba(194,133,94,.08); border-color: rgba(194,133,94,.2); animation-delay:.15s; }
+
+    .podium-rank {
+      font-size: 2rem; font-weight: 900; margin-bottom: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .rank-1 { color: var(--gold); text-shadow: 0 0 20px rgba(251,191,36,.5); }
+    .rank-2 { color: var(--silver); }
+    .rank-3 { color: var(--bronze); }
+    .podium-team { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .podium-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .podium-meta { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+    /* CHART */
+    .chart-wrap {
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px;
+      backdrop-filter: blur(12px); margin-bottom: 28px;
+      animation: fadeUp .4s ease .2s both;
+    }
+    .chart-title {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--cyan); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .chart-canvas { max-height: 220px; }
+
+    /* FILTER BAR */
+    .filter-bar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px; flex-wrap: wrap;
+      animation: fadeUp .4s ease .25s both;
+    }
+    .filter-bar input {
+      flex: 1; min-width: 200px; max-width: 340px;
+      background: var(--glass); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Outfit', sans-serif;
+      font-size: .9rem; padding: 9px 16px; border-radius: 8px;
+      outline: none; transition: border-color .2s;
+    }
+    .filter-bar input::placeholder { color: var(--muted); }
+    .filter-bar input:focus { border-color: var(--cyan); }
+    .filter-count { font-size: .8rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+    /* TABLE */
+    .table-wrap {
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      backdrop-filter: blur(12px);
+      animation: fadeUp .4s ease .3s both;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 14px 16px; text-align: left;
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    thead th.center { text-align: center; }
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(0,212,255,.04); }
+    tbody td { padding: 14px 16px; font-size: .9rem; }
+    tbody td.center { text-align: center; }
+
+    .td-rank {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 1rem;
+      width: 60px;
+    }
+    .td-rank.r1 { color: var(--gold); }
+    .td-rank.r2 { color: var(--silver); }
+    .td-rank.r3 { color: var(--bronze); }
+    .td-rank.rn { color: var(--muted); }
+
+    .td-team { font-weight: 600; }
+    .td-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; color: var(--cyan);
+    }
+    .td-solves { color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+    .td-time { color: var(--muted); font-size: .8rem; font-family: 'JetBrains Mono', monospace; }
+
+    .cat-badge {
+      display: inline-block; font-size: .68rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+    }
+    .cb-web    { background:rgba(59,130,246,.15); color:#60a5fa; }
+    .cb-pwn    { background:rgba(239,68,68,.15);  color:#f87171; }
+    .cb-re     { background:rgba(16,185,129,.15); color:#34d399; }
+    .cb-crypto { background:rgba(245,158,11,.15); color:#fbbf24; }
+    .cb-foren  { background:rgba(168,85,247,.15); color:#c084fc; }
+    .cb-misc   { background:rgba(236,72,153,.15); color:#f472b6; }
+    .cb-osint  { background:rgba(0,212,255,.15);  color:#00d4ff; }
+
+    /* EMPTY STATE */
+    .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      text-align: center; padding: 20px;
+      font-size: .75rem; color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    footer span { color: var(--cyan); }
+
+    @media (max-width: 640px) {
+      .podium { flex-direction: column; }
+      .podium-1 { order: -1; }
+      thead th.hide-sm, tbody td.hide-sm { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <a class="nav-logo" href="/">
+      <div class="hex">⬡</div>
+      GDU-CTF
+    </a>
+    <div class="nav-links">
+      <a href="/challenges">Thử thách</a>
+      <a href="/scoreboard" class="active">Bảng điểm</a>
+      <a href="/users">Người dùng</a>
+      <a href="/login" class="btn-login">Đăng nhập →</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>📊 Bảng xếp hạng</h1>
+      <p id="last-update">Đang tải dữ liệu...</p>
+    </div>
+
+    <!-- TOP 3 -->
+    <div class="podium" id="podium"></div>
+
+    <!-- CHART -->
+    <div class="chart-wrap">
+      <div class="chart-title">⚡ Score Over Time – Top 10</div>
+      <canvas class="chart-canvas" id="scoreChart"></canvas>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+      <input type="text" id="search" placeholder="🔍  Tìm kiếm đội thi...">
+      <span class="filter-count" id="filter-count"></span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="center">#</th>
+            <th>Đội thi</th>
+            <th class="center">Điểm</th>
+            <th class="center">Solves</th>
+            <th class="center hide-sm">Solve cuối</th>
+          </tr>
+        </thead>
+        <tbody id="scoreboard-body">
+          <tr><td colspan="5"><div class="empty"><div class="empty-icon">⏳</div>Đang tải...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <span>GDU Network &amp; Cybersecurity Club</span> · Trường Đại học Gia Định · Powered by CTFd
+  </footer>
+
+  <script>
+    // ── MOCK DATA (swap /api/scoreboard for real CTFd data) ──
+    const TEAMS = [
+      { rank:1,  name:"0xC0FFEE",      score:4850, solves:19, last:"2025-12-31 22:41" },
+      { rank:2,  name:"NullPointers",  score:4320, solves:17, last:"2025-12-31 22:55" },
+      { rank:3,  name:"ByteBreakers",  score:3970, solves:16, last:"2025-12-31 23:02" },
+      { rank:4,  name:"CryptoCrew",    score:3500, solves:14, last:"2025-12-31 21:30" },
+      { rank:5,  name:"StackSmashers", score:3100, solves:13, last:"2025-12-31 20:50" },
+      { rank:6,  name:"HexHunters",    score:2800, solves:11, last:"2025-12-31 20:10" },
+      { rank:7,  name:"GhostPing",     score:2400, solves:10, last:"2025-12-31 19:45" },
+      { rank:8,  name:"RevSlayers",    score:2150, solves: 9, last:"2025-12-31 18:30" },
+      { rank:9,  name:"NetNinjas",     score:1900, solves: 8, last:"2025-12-31 17:55" },
+      { rank:10, name:"PwnNewbies",    score:1600, solves: 7, last:"2025-12-31 17:20" },
+      { rank:11, name:"LittleHackers", score:1250, solves: 5, last:"2025-12-31 16:40" },
+      { rank:12, name:"ShadowPing",    score: 900, solves: 4, last:"2025-12-31 15:00" },
+      { rank:13, name:"ForensicForce", score: 600, solves: 3, last:"2025-12-31 14:20" },
+      { rank:14, name:"Beginnerz",     score: 350, solves: 2, last:"2025-12-31 13:00" },
+      { rank:15, name:"TryHarders",    score: 100, solves: 1, last:"2025-12-31 12:05" },
+    ];
+
+    // Score-over-time mock (hours 0..23)
+    const HOURS = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
+    const TOP5 = TEAMS.slice(0,5);
+    const COLORS = ['#00d4ff','#a855f7','#f59e0b','#10b981','#ec4899'];
+
+    // Simulate cumulative score progression
+    function mockTimeline(finalScore, seed) {
+      const pts = [0]; let acc = 0;
+      const steps = finalScore / 23;
+      for (let i=1;i<24;i++) {
+        const bump = Math.max(0, Math.round(steps*(0.5+Math.sin(i*seed)*0.5)));
+        acc = Math.min(finalScore, acc+bump);
+        pts.push(acc);
+      }
+      pts[23] = finalScore; return pts;
+    }
+
+    // ── RENDER PODIUM ──
+    function renderPodium() {
+      const top3 = TEAMS.slice(0,3);
+      const order = [top3[1], top3[0], top3[2]]; // 2nd, 1st, 3rd visual order on desktop
+      const podium = document.getElementById('podium');
+      podium.innerHTML = '';
+      top3.forEach((t, i) => {
+        const div = document.createElement('div');
+        div.className = `podium-card podium-${i+1}`;
+        const medals = ['🥇','🥈','🥉'];
+        div.innerHTML = `
+          <div class="podium-rank rank-${i+1}">${medals[i]}</div>
+          <div class="podium-team">${t.name}</div>
+          <div class="podium-score">${t.score.toLocaleString()}</div>
+          <div class="podium-meta">${t.solves} solves · Last: ${t.last}</div>
+        `;
+        podium.appendChild(div);
+      });
+    }
+
+    // ── RENDER CHART ──
+    function renderChart() {
+      const ctx = document.getElementById('scoreChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: HOURS,
+          datasets: TOP5.map((t,i) => ({
+            label: t.name,
+            data: mockTimeline(t.score, (i+1)*1.3),
+            borderColor: COLORS[i],
+            backgroundColor: COLORS[i]+'18',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4,
+            fill: false,
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 }, boxWidth: 12 } },
+            tooltip: {
+              backgroundColor: '#0d1225',
+              borderColor: 'rgba(0,212,255,.2)',
+              borderWidth: 1,
+              titleColor: '#00d4ff',
+              bodyColor: '#e2e8f0',
+            }
+          },
+          scales: {
+            x: { ticks: { color: '#475569', font:{size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+            y: { ticks: { color: '#475569', font:{size:10} }, grid: { color: 'rgba(255,255,255,.04)' } }
+          }
+        }
+      });
+    }
+
+    // ── RENDER TABLE ──
+    let allTeams = [...TEAMS];
+    function rankClass(r) {
+      if(r===1) return 'r1'; if(r===2) return 'r2'; if(r===3) return 'r3'; return 'rn';
+    }
+    function renderTable(teams) {
+      const tbody = document.getElementById('scoreboard-body');
+      if (!teams.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🔍</div>Không tìm thấy đội thi nào.</div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = teams.map(t => `
+        <tr>
+          <td class="td-rank center ${rankClass(t.rank)}">${t.rank}</td>
+          <td class="td-team">${t.name}</td>
+          <td class="td-score center">${t.score.toLocaleString()}</td>
+          <td class="td-solves center">${t.solves}</td>
+          <td class="td-time center hide-sm">${t.last}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ── SEARCH / FILTER ──
+    document.getElementById('search').addEventListener('input', function() {
+      const q = this.value.trim().toLowerCase();
+      const filtered = q ? allTeams.filter(t => t.name.toLowerCase().includes(q)) : allTeams;
+      document.getElementById('filter-count').textContent =
+        q ? `${filtered.length} / ${allTeams.length} đội` : `${allTeams.length} đội`;
+      renderTable(filtered);
+    });
+
+    // ── INIT ──
+    renderPodium();
+    renderChart();
+    renderTable(allTeams);
+    document.getElementById('last-update').textContent =
+      `Cập nhật lần cuối: ${new Date().toLocaleTimeString('vi-VN')} · ${allTeams.length} đội thi`;
+    document.getElementById('filter-count').textContent = `${allTeams.length} đội`;
+  </script>
+</body>
+</html>

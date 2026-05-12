@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thử thách · GDU-CTF</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080c18;
+      --cyan: #00d4ff;
+      --purple: #a855f7;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --border: rgba(0,212,255,.14);
+      --glass: rgba(13,18,37,.75);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+    /* GRID BG */
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+      background-size: 60px 60px; animation: gridDrift 20s linear infinite;
+    }
+    @keyframes gridDrift { 100%{ background-position:60px 60px; } }
+
+    /* NAVBAR (Giống các trang khác) */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,12,24,.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+      padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-weight:800; }
+    .nav-logo .hex {
+      width:32px; height:32px; background: linear-gradient(135deg, var(--cyan), var(--purple));
+      clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+      display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:900; color:#fff;
+    }
+    .nav-links { display:flex; gap:4px; }
+    .nav-links a { color: rgba(226,232,240,.65); text-decoration:none; font-size:.85rem; font-weight:500; padding:6px 14px; border-radius:6px; transition:all .2s; }
+    .nav-links a:hover { color:var(--cyan); background:rgba(0,212,255,.08); }
+    .nav-links a.active { color:var(--cyan); }
+    .nav-links a.btn-login { background: linear-gradient(135deg, var(--cyan), var(--purple)); color:#fff; font-weight:700; box-shadow: 0 0 16px rgba(0,212,255,.25); }
+
+    main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* HEADER */
+    .page-header { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .page-header h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #fff 30%, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    /* CATEGORY FILTER */
+    .cat-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .cat-btn {
+      background: var(--glass); border: 1px solid var(--border); color: var(--text);
+      padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s;
+    }
+    .cat-btn:hover, .cat-btn.active { background: rgba(0,212,255,.1); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,.2); }
+
+    /* CHALLENGE GRID */
+    .chall-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    
+    .chall-card {
+      background: var(--glass); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px; backdrop-filter: blur(12px); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .chall-card:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 8px 24px rgba(0,212,255,.15); }
+    .chall-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--cyan); opacity: 0.5; }
+    
+    .chall-card.solved::before { background: #10b981; opacity: 1; }
+    .chall-card.solved { border-color: rgba(16,185,129,.3); }
+
+    .chall-cat { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--purple); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .chall-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; }
+    .chall-stats { display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .chall-score { color: var(--cyan); font-weight: 700; font-size: 1rem; }
+    .chall-solves { color: var(--muted); }
+    
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+      z-index: 1000; display: none; align-items: center; justify-content: center;
+    }
+    .modal {
+      background: #0d1225; border: 1px solid var(--border); border-radius: 16px;
+      width: 100%; max-width: 600px; padding: 32px; box-shadow: 0 0 40px rgba(0,212,255,.2);
+      animation: modalFadeIn 0.3s ease; position: relative;
+    }
+    @keyframes modalFadeIn { from{opacity:0; transform:scale(0.95)} to{opacity:1; transform:none} }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; }
+    .modal-close:hover { color: #fff; }
+    .modal-cat { font-family: 'JetBrains Mono', monospace; color: var(--cyan); font-size: 0.8rem; margin-bottom: 8px; }
+    .modal-title { font-size: 1.8rem; margin-bottom: 16px; }
+    .modal-desc { color: rgba(226,232,240,.8); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    
+    .flag-input-group { display: flex; gap: 8px; }
+    .flag-input {
+      flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff;
+      padding: 12px 16px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; outline: none;
+    }
+    .flag-input:focus { border-color: var(--cyan); }
+    .flag-btn {
+      background: linear-gradient(135deg, var(--cyan), var(--purple)); color: #fff; border: none;
+      padding: 0 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .flag-btn:hover { box-shadow: 0 0 16px rgba(0,212,255,.4); }
+
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); text-align: center; padding: 20px; font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav>
+    <a class="nav-logo" href="/">
+      <div class="hex">⬡</div> GDU-CTF
+    </a>
+    <div class="nav-links">
+      <a href="/challenges" class="active">Thử thách</a>
+      <a href="/scoreboard">Bảng điểm</a>
+      <a href="/users">Người dùng</a>
+      <a href="/login" class="btn-login">Đăng nhập →</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>🚩 Thử thách</h1>
+    </div>
+
+    <div class="cat-filters" id="filters">
+      <button class="cat-btn active" data-cat="all">ALL</button>
+      <button class="cat-btn" data-cat="web">WEB</button>
+      <button class="cat-btn" data-cat="crypto">CRYPTO</button>
+      <button class="cat-btn" data-cat="forensics">FORENSICS</button>
+      <button class="cat-btn" data-cat="pwn">PWN</button>
+      <button class="cat-btn" data-cat="re">RE</button>
+      <button class="cat-btn" data-cat="misc">MISC</button>
+    </div>
+
+    <div class="chall-grid" id="chall-grid">
+      <!-- Generated via JS -->
+    </div>
+  </main>
+
+  <footer>
+    GDU Network & Cybersecurity Club · Powered by CTFd
+  </footer>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="modal-cat" id="m-cat">WEB</div>
+      <h2 class="modal-title" id="m-title">SQLi Easy</h2>
+      <div class="modal-desc" id="m-desc">Tìm cách khai thác lỗ hổng SQL Injection trên trang đăng nhập để lấy flag.</div>
+      <div class="flag-input-group">
+        <input type="text" class="flag-input" placeholder="GDUCTF{...}">
+        <button class="flag-btn">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CHALLES = [
+      { id:1, name: "SQLi Easy", cat: "web", score: 100, solves: 45, desc: "Trang web này có lỗ hổng SQLi kinh điển. Đăng nhập với quyền admin nhé!", solved: true },
+      { id:2, name: "IDOR Medium", cat: "web", score: 250, solves: 12, desc: "Hãy tìm cách xem thông tin profile của user khác.", solved: false },
+      { id:3, name: "Caesar Cipher", cat: "crypto", score: 50, solves: 120, desc: "Mật mã Caesar cổ điển. Shift là bao nhiêu?", solved: true },
+      { id:4, name: "File Hidden", cat: "forensics", score: 150, solves: 30, desc: "Có một bí mật được giấu trong file âm thanh này.", solved: false },
+      { id:5, name: "BoF Easy", cat: "pwn", score: 300, solves: 5, desc: "Ghi đè RIP để nhảy đến hàm print_flag().", solved: false },
+      { id:6, name: "XOR Magic", cat: "re", score: 200, solves: 18, desc: "Dịch ngược file ELF này và tìm key XOR.", solved: false },
+      { id:7, name: "Linux Quiz", cat: "misc", score: 50, solves: 80, desc: "Trả lời các câu hỏi về lệnh Linux cơ bản.", solved: false },
+      { id:8, name: "TLS Challenge", cat: "forensics", score: 400, solves: 2, desc: "Phân tích file PCAP và Keylog để tìm dữ liệu bị ẩn trong traffic HTTPS.", solved: false }
+    ];
+
+    const grid = document.getElementById('chall-grid');
+    const filters = document.querySelectorAll('.cat-btn');
+
+    function renderChalls(cat) {
+      grid.innerHTML = '';
+      const filtered = cat === 'all' ? CHALLES : CHALLES.filter(c => c.cat === cat);
+      filtered.forEach(c => {
+        const el = document.createElement('div');
+        el.className = `chall-card ${c.solved ? 'solved' : ''}`;
+        el.onclick = () => openModal(c);
+        el.innerHTML = `
+          <div class="chall-cat">${c.cat}</div>
+          <div class="chall-name">${c.name}</div>
+          <div class="chall-stats">
+            <span class="chall-score">${c.score} pts</span>
+            <span class="chall-solves">${c.solves} solves</span>
+          </div>
+        `;
+        grid.appendChild(el);
+      });
+    }
+
+    filters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filters.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderChalls(btn.dataset.cat);
+      });
+    });
+
+    function openModal(c) {
+      document.getElementById('m-cat').textContent = c.cat.toUpperCase();
+      document.getElementById('m-title').textContent = c.name;
+      document.getElementById('m-desc').textContent = c.desc;
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    // Đóng modal khi click ra ngoài
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if(e.target === document.getElementById('modal')) closeModal();
+    });
+
+    renderChalls('all');
+  </script>
+</body>
+</html>
