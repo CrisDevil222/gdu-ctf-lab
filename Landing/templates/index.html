@@ -307,15 +307,15 @@
 
       <div class="stats-row">
         <div class="stat-card">
-          <div class="stat-num">127</div>
+          <div class="stat-num">01</div>
           <div class="stat-lbl">Đội thi</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num">32</div>
+          <div class="stat-num">22</div>
           <div class="stat-lbl">Thử thách</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num">7</div>
+          <div class="stat-num">07</div>
           <div class="stat-lbl">Danh mục</div>
         </div>
         <div class="stat-card">
@@ -389,17 +389,23 @@
   </footer>
 
   <script>
-    // Countdown to a fixed end time (adjust as needed)
-    const END = new Date('2025-12-31T23:59:59+07:00').getTime();
+    // Countdown to a fixed end time (Ví dụ: 30 ngày kể từ bây giờ)
+    const END = new Date();
+    END.setDate(END.getDate() + 30); // Đặt mốc 30 ngày nữa
+    const endTime = END.getTime();
+
     function tick() {
-      const now = Date.now(), diff = END - now;
+      const now = Date.now(), diff = endTime - now;
       const el = document.getElementById('countdown');
       if (!el) return;
       if (diff <= 0) { el.textContent = 'KẾT THÚC'; return; }
-      const h = String(Math.floor(diff/3600000)).padStart(2,'0');
-      const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-      const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-      el.textContent = `${h}:${m}:${s}`;
+      
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2,'0');
+      const m = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2,'0');
+      const s = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2,'0');
+      
+      el.textContent = d > 0 ? `${d}d ${h}:${m}:${s}` : `${h}:${m}:${s}`;
     }
     tick(); setInterval(tick, 1000);
   </script>
